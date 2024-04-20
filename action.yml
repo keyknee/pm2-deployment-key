@@ -48,7 +48,7 @@ runs:
         target: ${{ inputs.remote-path }}
 
     - name: Install project
-      uses: appleboy/ssh-action@1.0.3
+      uses: appleboy/ssh-action@v1.0.3
       with:
         HOST: ${{ inputs.host }}
         USERNAME: ${{ inputs.username }}
@@ -59,7 +59,7 @@ runs:
 
     - name: Build your project
       if: ${{ inputs.build == true }}
-      uses: appleboy/ssh-action@1.0.3
+      uses: appleboy/ssh-action@v1.0.3
       with:
         HOST: ${{ inputs.host }}
         USERNAME: ${{ inputs.username }}
@@ -69,7 +69,7 @@ runs:
         script: cd ${{ inputs.remote-path }} && npm run build
 
     - name: Reload remote application
-      uses: appleboy/ssh-action@1.0.3
+      uses: appleboy/ssh-action@v1.0.3
       with:
         HOST: ${{ inputs.host }}
         USERNAME: ${{ inputs.username }}
@@ -79,7 +79,7 @@ runs:
         script: cd ${{ inputs.remote-path }} && pm2 reload ecosystem.config.js
 
     - name: Reset number of restarts
-      uses: appleboy/ssh-action@1.0.3
+      uses: appleboy/ssh-action@v1.0.3
       with:
         HOST: ${{ inputs.host }}
         USERNAME: ${{ inputs.username }}
