@@ -27,9 +27,10 @@ inputs:
     description: "PM2 ID or Name of the process"
     required: true
 
+if: inputs.password || inputs.key
 runs:
   using: "composite"
-  if: inputs.password || inputs.key
+
   steps:
     - name: Get repository content
       uses: actions/checkout@v4
