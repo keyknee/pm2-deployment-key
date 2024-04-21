@@ -1,28 +1,25 @@
 name: "PM2 Deployment"
 description: "Deploy your nodejs or typescript app with PM2"
-
-secrets:
+inputs:
+  build:
+    required: false
+    default: "false"
   host:
     description: "Remote host"
     required: true
   username:
     description: "Username to login"
     required: true
+  port:
+    description: "SSH port"
+    required: false
+    default: "22"
   password:
     description: "SSH password"
     required: false
   key:
     description: "SSH key"
     required: false
-
-inputs:
-  build:
-    required: false
-    default: "false"
-  port:
-    description: "SSH port"
-    required: false
-    default: "22"
   remote-path:
     description: "Remote path where the files are going to be copied"
     required: true
@@ -30,7 +27,7 @@ inputs:
     description: "PM2 ID or Name of the process"
     required: true
 
-if: secrets.password || secrets.key
+if: inputs.password || inputs.key
 runs:
   using: "composite"
 
@@ -41,11 +38,11 @@ runs:
     - name: Copy repository content
       uses: appleboy/scp-action@v0.1.7
       env:
-        HOST: ${{ secrets.host }}
-        USERNAME: ${{ secrets.username }}
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
         PORT: ${{ inputs.port }}
-        PASSWORD: ${{ secrets.password }}
-        KEY: ${{ secrets.key }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
       with:
         source: "."
         target: ${{ inputs.remote-path }}
@@ -53,40 +50,40 @@ runs:
     - name: Install project
       uses: appleboy/ssh-action@v1.0.3
       with:
-        HOST: ${{ secrets.host }}
-        USERNAME: ${{ secrets.username }}
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
         PORT: ${{ inputs.port }}
-        PASSWORD: ${{ secrets.password }}
-        KEY: ${{ secrets.key }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
         script: cd ${{ inputs.remote-path }} && npm ci
 
     - name: Build your project
       if: ${{ inputs.build == true }}
       uses: appleboy/ssh-action@v1.0.3
       with:
-        HOST: ${{ secrets.host }}
-        USERNAME: ${{ secrets.username }}
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
         PORT: ${{ inputs.port }}
-        PASSWORD: ${{ secrets.password }}
-        KEY: ${{ secrets.key }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
         script: cd ${{ inputs.remote-path }} && npm run build
 
     - name: Reload remote application
       uses: appleboy/ssh-action@v1.0.3
       with:
-        HOST: ${{ secrets.host }}
-        USERNAME: ${{ secrets.username }}
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
         PORT: ${{ inputs.port }}
-        PASSWORD: ${{ secrets.password }}
-        KEY: ${{ secrets.key }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
         script: cd ${{ inputs.remote-path }} && pm2 reload ecosystem.config.js
 
     - name: Reset number of restarts
       uses: appleboy/ssh-action@v1.0.3
       with:
-        HOST: ${{ secrets.host }}
-        USERNAME: ${{ secrets.username }}
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
         PORT: ${{ inputs.port }}
-        PASSWORD: ${{ secrets.password }}
-        KEY: ${{ secrets.key }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
         script: pm2 reset ${{ inputs.pm2-id }}
