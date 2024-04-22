@@ -35,6 +35,9 @@ runs:
     - name: Get repository content
       uses: actions/checkout@v4
 
+    - name: A Hailmary of Sorts
+      run: sudo su
+
     - name: Copy repository content
       uses: appleboy/scp-action@v0.1.7
       env:
