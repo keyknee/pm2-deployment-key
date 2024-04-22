@@ -36,6 +36,7 @@ runs:
       uses: actions/checkout@v4
 
     - name: A Hailmary of Sorts
+      shell: bash
       run: sudo su
 
     - name: Copy repository content
