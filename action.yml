@@ -53,6 +53,7 @@ runs:
         key: ${{ inputs.key }}
         source: "."
         target: ${{ inputs.remote-path }}
+        tar_tmp_path: "/var/www/temp"
 
     - name: Install project
       uses: appleboy/ssh-action@v1.0.3
