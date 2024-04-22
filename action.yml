@@ -44,6 +44,9 @@ runs:
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
       with:
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
         source: "."
         target: ${{ inputs.remote-path }}
 
