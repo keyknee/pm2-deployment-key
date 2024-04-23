@@ -39,14 +39,20 @@ runs:
       shell: bash
       run: sudo su
 
-    - name: rsync deployment
-      uses: burnett01/rsync-deployments@7.0.1
+    - name: Copy repository content
+      uses: appleboy/scp-action@v0.1.7
+      env:
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
+        PORT: ${{ inputs.port }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
       with:
-        switches: -avzr --update --progress
-        remote_path: ${{ inputs.remote-path }}
-        remote_host: ${{ inputs.host }}
-        remote_user: ${{ inputs.username }}
-        remote_key: ${{ inputs.key }}
+        host: ${{ inputs.host }}
+        username: ${{ inputs.username }}
+        key: ${{ inputs.key }}
+        source: "."
+        target: ${{ inputs.remote-path }}
 
     - name: Install project
       uses: appleboy/ssh-action@v1.0.3
