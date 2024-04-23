@@ -35,10 +35,6 @@ runs:
     - name: Get repository content
       uses: actions/checkout@v4
 
-    - name: A Hailmary of Sorts
-      shell: bash
-      run: sudo su
-
     - name: rsync deployment
       uses: burnett01/rsync-deployments@7.0.1
       with:
