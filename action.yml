@@ -42,7 +42,7 @@ runs:
     - name: rsync deployment
       uses: burnett01/rsync-deployments@7.0.1
       with:
-        switches: -avzr --update --progress --omit-dir-times
+        switches: -avzr --update --progress --omit-dir-times --no-perms
         remote_path: ${{ inputs.remote-path }}
         remote_host: ${{ inputs.host }}
         remote_user: ${{ inputs.username }}
