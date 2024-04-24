@@ -4,6 +4,10 @@ inputs:
   build:
     required: false
     default: "false"
+  copy:
+    description: "Should files be copied from another remote directory - such as from staging to production? "
+    required: false
+    default: "false"
   host:
     description: "Remote host"
     required: true
@@ -20,8 +24,10 @@ inputs:
   key:
     description: "SSH key"
     required: false
-  remote-path:
-    description: "Remote path where the files are going to be copied"
+  remote-source-path:
+    description: 'Remote path files will be copied *from* - required if "copy" input is true'
+  remote-target-path:
+    description: "Remote path where files will be copied *to*"
     required: true
   pm2-id:
     description: "PM2 ID or Name of the process"
@@ -35,14 +41,26 @@ runs:
     - name: Get repository content
       uses: actions/checkout@v4
 
-    - name: rsync deployment
+    - name: Copy to remote target
       uses: burnett01/rsync-deployments@7.0.1
+      if: ${{ !inputs.copy || inputs.copy == "false" }}
       with:
         switches: -avzr --update --progress --omit-dir-times --no-perms --chmod=ugo=rwX
-        remote_path: ${{ inputs.remote-path }}
+        remote_path: ${{ inputs.remote-target-path }}
         remote_host: ${{ inputs.host }}
         remote_user: ${{ inputs.username }}
         remote_key: ${{ inputs.key }}
+
+    - name: Copy from remote source to target on same
+      uses: appleboy/ssh-action@v1.0.3
+      if: ${{ inputs.copy == true && inputs.remote-source-path }}
+      with:
+        HOST: ${{ inputs.host }}
+        USERNAME: ${{ inputs.username }}
+        PORT: ${{ inputs.port }}
+        PASSWORD: ${{ inputs.password }}
+        KEY: ${{ inputs.key }}
+        script: cp -R ${{ inputs.remote-source-path }}/* ${{ inputs.remote-target-path }}
 
     - name: Install project
       uses: appleboy/ssh-action@v1.0.3
@@ -52,7 +70,7 @@ runs:
         PORT: ${{ inputs.port }}
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
-        script: cd ${{ inputs.remote-path }} && npm ci
+        script: cd ${{ inputs.remote-target-path }} && npm ci
 
     - name: Build your project
       if: ${{ inputs.build == true }}
@@ -63,7 +81,7 @@ runs:
         PORT: ${{ inputs.port }}
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
-        script: cd ${{ inputs.remote-path }} && npm run build
+        script: cd ${{ inputs.remote-target-path }} && npm run build
 
     - name: Reload remote application
       uses: appleboy/ssh-action@v1.0.3
@@ -73,7 +91,7 @@ runs:
         PORT: ${{ inputs.port }}
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
-        script: cd ${{ inputs.remote-path }} && pm2 reload ecosystem.config.js
+        script: cd ${{ inputs.remote-target-path }} && pm2 reload ${{ inputs.pm2-id }}
 
     - name: Reset number of restarts
       uses: appleboy/ssh-action@v1.0.3
