@@ -43,7 +43,7 @@ runs:
 
     - name: Copy to remote target
       uses: burnett01/rsync-deployments@7.0.1
-      if: ${{ !inputs.copy || inputs.copy == "false" }}
+      if: ${{ !inputs.copy }}
       with:
         switches: -avzr --update --progress --omit-dir-times --no-perms --chmod=ugo=rwX
         remote_path: ${{ inputs.remote-target-path }}
