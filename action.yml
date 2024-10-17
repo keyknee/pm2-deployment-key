@@ -32,6 +32,10 @@ inputs:
   pm2-id:
     description: "PM2 ID or Name of the process"
     required: true
+  pnpm-instead:
+    description: "Should we use pnpm instead of npm for this repo?"
+    required: false
+    default: false
 
 if: inputs.password || inputs.key
 runs:
@@ -70,7 +74,7 @@ runs:
         PORT: ${{ inputs.port }}
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
-        script: cd ${{ inputs.remote-target-path }} && npm ci
+        script: cd ${{ inputs.remote-target-path }} && ${{ inputs.pnpm-instead == true && "pnpm setup" || "npm run setup"}}
 
     - name: Build your project
       if: ${{ inputs.build == true }}
@@ -81,7 +85,7 @@ runs:
         PORT: ${{ inputs.port }}
         PASSWORD: ${{ inputs.password }}
         KEY: ${{ inputs.key }}
-        script: cd ${{ inputs.remote-target-path }} && npm run build
+        script: cd ${{ inputs.remote-target-path }} && ${{ inputs.pnpm-instead == true && "pnpm build" || "npm run build"}}
 
     - name: Reload remote application
       uses: appleboy/ssh-action@v1.0.3
